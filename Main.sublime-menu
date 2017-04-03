@@ -1,0 +1,17 @@
+[
+	{
+		"caption": "CSSE2002Marking",
+		"id": "csse2002marking",
+		"children":
+			[
+				{
+					"caption": "Sum Marks (Assignment 1-2)",
+					"command": "calc_marks_quality"
+				},
+				{
+					"caption": "Sum Marks (Assignment 3)",
+					"command": "calc_marks"
+				}
+			]
+	}
+]
