@@ -24,7 +24,7 @@ def find_marks_a12(text):
 	''' Parse the text to retrieve testing and quality marks for Assignment 1/2
 	'''
 	lines = text.split('\n')
-	quality = [-1, -1, -1, -1, -1, -1, -1]
+	quality = [-1] * len(quality_markers)
 
 	for line in lines:
 		for marker in quality_markers:
@@ -48,8 +48,8 @@ def find_marks_a3(text):
 	'''
 	lines = text.split('\n')
 
-	quality = [-1, -1, -1, -1, -1, -1]
-	tests = [-1, -1, -1, -1, -1, -1]
+	quality = [-1] * len(quality_markers[:-1])
+	tests = [-1] * len(test_markers)
 
 	for line in lines:
 		# Find quality grades
@@ -81,6 +81,40 @@ def find_marks_a3(text):
 		sublime.error_message("Missing testing section " + test_markers[tests.index(-1)])
 
 	return [tests, quality]
+
+
+def find_max_marks_per_section(text, markers):
+	lines = text.split('\n')
+	max_marks = [-1] * len(markers)
+
+	for line in lines:
+		for marker in markers:
+			if line.startswith(marker):
+				if len(line.split(']')) <= 1:
+					sublime.error_message("Missing ] on marker " + marker)
+				# Get the max marks for the section, from the part of the line in the form [poor=0, fair=0.5, good=1]
+				try:
+					max_marks[markers.index(marker)] = float((line.split(']')[-2]).split('=')[-1])
+				except ValueError:
+					sublime.error_message("Invalid max marks on marker " + marker)
+				except Exception as e:
+					sublime.error_message("Could not retrieve max marks for marker " + marker + " due to exception: " + str(e))
+
+	return max_marks
+
+
+def check_marks_in_range(marks, max_marks, markers):
+	if -1 in max_marks:
+		sublime.error_message("Missing max marks on marker " + markers[max_marks.index(-1)])
+		return False
+
+	for i in range(0, len(markers)):
+		if marks[i] > max_marks[i]:
+			sublime.error_message("Mark greater than maximum on marker {} ({} > {})".format(markers[i], marks[i], max_marks[i]))
+			return False
+		elif marks[i] < 0:
+			sublime.error_message("Mark less than 0 on marker {} ({} < 0)".format(markers[i], marks[i]))
+	return True
 
 
 def set_overall_grade_a12(view, edit, grade):
@@ -156,7 +190,7 @@ def set_overall_grade_a3(view, edit, testing_grade, quality_grade):
 		view.insert(edit, qualPoint, " {0}".format(quality_grade))
 
 
-class CalcMarksCommand(sublime_plugin.TextCommand):
+class CalcMarksAssignment3Command(sublime_plugin.TextCommand):
 	def run(self, edit):
 		text = self.view.substr(sublime.Region(0, self.view.size()))
 
@@ -169,7 +203,8 @@ class CalcMarksCommand(sublime_plugin.TextCommand):
 		# Set the overall grades
 		set_overall_grade_a3(self.view, edit, testing_grade, quality_grade)
 
-class CalcMarksQualityCommand(sublime_plugin.TextCommand):
+
+class CalcMarksAssignment1Command(sublime_plugin.TextCommand):
 	def run(self, edit):
 		text = self.view.substr(sublime.Region(0, self.view.size()))
 
@@ -179,5 +214,23 @@ class CalcMarksQualityCommand(sublime_plugin.TextCommand):
 		# Get the quality grade from those marks
 		grade = calc_overall_quality(marks)
 
-		# Set the overall grades
-		set_overall_grade_a12(self.view, edit, grade)
+		if check_marks_in_range(marks, find_max_marks_per_section(text, quality_markers), quality_markers):
+			# Set the overall grades
+			set_overall_grade_a12(self.view, edit, grade)
+
+
+class CalcMarksAssignment2Command(sublime_plugin.TextCommand):
+	def run(self, edit):
+		text = self.view.substr(sublime.Region(0, self.view.size()))
+
+		# Get the grades
+		marks = find_marks_a12(text)
+		
+		# Get the quality grade from those marks
+		grade = calc_overall_quality(marks)
+
+		if check_marks_in_range(marks, find_max_marks_per_section(text, quality_markers), quality_markers):
+			# Set the overall grades
+			set_overall_grade_a12(self.view, edit, grade)
+
+

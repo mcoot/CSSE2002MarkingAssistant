@@ -5,12 +5,16 @@
 		"children":
 			[
 				{
-					"caption": "Sum Marks (Assignment 1-2)",
-					"command": "calc_marks_quality"
+					"caption": "Sum Marks (Assignment 1)",
+					"command": "calc_marks_assignment1"
+				},
+				{
+					"caption": "Sum Marks (Assignment 2)",
+					"command": "calc_marks_assignment2"
 				},
 				{
 					"caption": "Sum Marks (Assignment 3)",
-					"command": "calc_marks"
+					"command": "calc_marks_assignment3"
 				}
 			]
 	}
