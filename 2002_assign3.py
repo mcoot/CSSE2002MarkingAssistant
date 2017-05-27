@@ -2,7 +2,7 @@ import sublime, sublime_plugin
 import math
 
 # Sections to parse
-test_markers = ('Scenario 1', 'Scenario 2', 'Scenario 3', 'Scenario 4', 'Scenario 5', 'Scenario 6')
+test_markers = ('Scenario 1', 'Scenario 2', 'Scenario 3', 'Scenario 4', 'Scenario 5')
 quality_markers = ('i.', 'ii.', 'iii.', 'iv.', 'v.', 'vi.', 'vii.')
 grade_markers = ('Testing:', 'Usability:', 'Quality:')
 
